@@ -7,6 +7,8 @@
 
 import Swinject
 
+public typealias SwinjectWrapperContainer = Container
+
 public extension Container {
     
     //MARK: Private Static
