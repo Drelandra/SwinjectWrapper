@@ -43,14 +43,37 @@ public extension Container {
     ///                  that have the same service and factory types.
     ///   - factory:     The autoclosure to add the service's dependencies that can be automatically resolved
     ///                  or resolved with the dependencies of the type from outside of this scope.
+    ///   - objectScope: A configuration how an instance provided by a ``Container`` is shared in the system. Defaults to `graph`.
+    @discardableResult
     func autoRegister<Service>(
         _ serviceType: Service.Type,
         name: String? = nil,
-        for factory: @autoclosure @escaping () -> Service
-    ) {
+        for factory: @autoclosure @escaping () -> Service,
+        objectScope: ObjectScope = .graph
+    ) -> ServiceEntry<Service> {
         Container.shared.register(serviceType, name: name) { _ in
             factory()
-        }
+        }.inObjectScope(objectScope)
+    }
+    
+    /// Adds an auto registration for the specified service with the factory autoclosure to add the service's dependencies.
+    /// - Parameters:
+    ///   - serviceType: The service type to register.
+    ///   - name:        A registration name type, which is used to differentiate from other registrations
+    ///                  that have the same service and factory types.
+    ///   - factory:     The autoclosure to add the service's dependencies that can be automatically resolved
+    ///                  or resolved with the dependencies of the type from outside of this scope.
+    ///   - objectScope: A configuration how an instance provided by a ``Container`` is shared in the system. Defaults to `graph`.
+    @discardableResult
+    func autoRegister<Service>(
+        _ serviceType: Service.Type,
+        name: InjectIdentifiable?,
+        for factory: @autoclosure @escaping () -> Service,
+        objectScope: ObjectScope = .graph
+    ) -> ServiceEntry<Service> {
+        Container.shared.register(serviceType, name: name?.injectID) { _ in
+            factory()
+        }.inObjectScope(objectScope)
     }
     
     /// Retrieves the instance with the specified service type and registration name.
